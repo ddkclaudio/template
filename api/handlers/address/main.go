@@ -13,9 +13,9 @@ import (
 )
 
 var (
-	ctrl *controller.Controller
 	path string = "/addresses"
-	rep  *repository.MySQLRepo
+	ctrl *controller.Controller
+	rep  *repository.PostgresRepo
 	srv  *service.MainService
 )
 

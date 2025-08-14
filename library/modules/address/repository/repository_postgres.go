@@ -9,7 +9,7 @@ import (
 	"github.com/library/modules/address/domain"
 	"github.com/library/modules/address/dto"
 
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
@@ -18,30 +18,30 @@ var (
 	once       sync.Once
 )
 
-type MySQLRepo struct {
+type PostgresRepo struct {
 	db *gorm.DB
 }
 
-func NewMySQLRepo() *MySQLRepo {
+func NewMySQLRepo() *PostgresRepo {
 	db := getDBInstance()
-	return &MySQLRepo{db: db}
+	return &PostgresRepo{db: db}
 }
 
-func (r *MySQLRepo) Create(entity *domain.Entity) (*domain.Entity, error) {
+func (r *PostgresRepo) Create(entity *domain.Entity) (*domain.Entity, error) {
 	if err := r.db.Create(entity).Error; err != nil {
 		return nil, err
 	}
 	return entity, nil
 }
 
-func (r *MySQLRepo) Delete(id string) error {
+func (r *PostgresRepo) Delete(id string) error {
 	if err := r.db.Delete(&domain.Entity{}, "id = ?", id).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *MySQLRepo) Get(id string) (*domain.Entity, error) {
+func (r *PostgresRepo) Get(id string) (*domain.Entity, error) {
 	var entity domain.Entity
 	if err := r.db.First(&entity, "id = ?", id).Error; err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func (r *MySQLRepo) Get(id string) (*domain.Entity, error) {
 	return &entity, nil
 }
 
-func (r *MySQLRepo) List(filter dto.FilterRequestDTO) ([]*domain.Entity, error) {
+func (r *PostgresRepo) List(filter dto.FilterRequestDTO) ([]*domain.Entity, error) {
 	var entityList []*domain.Entity
 
 	const defaultPage = 1
@@ -76,7 +76,7 @@ func (r *MySQLRepo) List(filter dto.FilterRequestDTO) ([]*domain.Entity, error) 
 	return entityList, nil
 }
 
-func (r *MySQLRepo) Update(entity *domain.Entity) (*domain.Entity, error) {
+func (r *PostgresRepo) Update(entity *domain.Entity) (*domain.Entity, error) {
 	if err := r.db.Save(entity).Error; err != nil {
 		return nil, err
 	}
@@ -93,10 +93,14 @@ func getDBInstance() *gorm.DB {
 		port := cfg.DBPort
 		dbName := cfg.DBName
 
-		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", user, password, host, port, dbName)
+		// DSN PostgreSQL sem sslmode
+		dsn := fmt.Sprintf(
+			"host=%s port=%d user=%s password=%s dbname=%s",
+			host, port, user, password, dbName,
+		)
 
 		var err error
-		dbInstance, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+		dbInstance, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 		if err != nil {
 			log.Fatalf("Error connecting to the database: %v", err)
 		}
