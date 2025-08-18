@@ -15,7 +15,7 @@ import (
 var (
 	path string = "/addresses"
 	ctrl *controller.Controller
-	rep  *repository.PostgresRepo
+	rep  domain.Repository
 	srv  *service.MainService
 )
 

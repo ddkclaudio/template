@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/library/modules/{{ toSnake .Title }}/controller"
+	"github.com/library/modules/{{ toSnake .Title }}/domain"
 	"github.com/library/modules/{{ toSnake .Title }}/repository"
 	"github.com/library/modules/{{ toSnake .Title }}/service"
 	"github.com/library/utils"
@@ -15,7 +16,7 @@ import (
 var (
 	ctrl *controller.Controller
 	path string = "/{{ pluralize (toSnake .Title) }}"
-	rep  *repository.MySQLRepo
+	rep  domain.Repository
 	srv  *service.MainService
 )
 
@@ -32,7 +33,7 @@ func RegisterRoutes(rg *gin.RouterGroup) {
 }
 
 func init() {
-	rep = repository.NewMySQLRepo()
+	rep = repository.NewPostgresRepo()
 	srv = service.NewService(rep)
 	ctrl = controller.NewController(srv)
 }
