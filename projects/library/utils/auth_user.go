@@ -121,14 +121,14 @@ func GetAuthUser(authorizer map[string]interface{}) (*AuthUser, error) {
 	return &authUser, nil
 }
 
-func HasPermission(authUser *AuthUser, resourceOwnerID *string) bool {
+func HasPermission(authUser *AuthUser, resourceOwnerID string) bool {
 	if ContainsRole(authUser.Roles, "admin") {
 		return true
 	}
-	if resourceOwnerID == nil {
+	if resourceOwnerID == "" {
 		return false
 	}
-	return authUser.Id == *resourceOwnerID
+	return authUser.Id == resourceOwnerID
 }
 
 func mapClaimsToStruct(claims jwt.MapClaims) (AuthUser, error) {

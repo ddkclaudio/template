@@ -1,16 +1,7 @@
 package domain
 
-import (
-	"fmt"
-
-	"github.com/library/utils"
-	"github.com/google/uuid"
-)
-
 type Entity struct {
-{{- range .Keys }}
-  {{- $name := . }}
-  {{- $prop := index $.Properties $name }}
+{{- range $name, $prop := .Properties }}
   {{- $type := JSONTypeToGoType $prop.Type }}
   {{- if not (isRequired $name $.Required) }}
   {{ $name | toPascal }} *{{ $type }} `json:"{{ toSnake $name }}"` 
@@ -20,119 +11,8 @@ type Entity struct {
 {{- end }}
 }
 
-func (e Entity) Validate() error {
-{{- range .Keys }}
-  {{- $name := . }}
-  {{- $prop := index $.Properties $name }}
-  {{- $field := $name | toPascal }}
-
-  {{- if isRequired $name $.Required }}
-  if e.{{ $field }} == {{ zeroValue $prop.Type }} {
-    return fmt.Errorf("field '{{ $name }}' is required")
-  }
-  {{- if eq $prop.Type "string" }}
-    {{- if $prop.MinLength }}
-  if err := utils.ValidateMinLength(e.{{ $field }}, {{ $prop.MinLength }}); err != nil {
-    return fmt.Errorf("field '{{ $name }}': %w", err)
-  }
-    {{- end }}
-    {{- if $prop.MaxLength }}
-  if err := utils.ValidateMaxLength(e.{{ $field }}, {{ $prop.MaxLength }}); err != nil {
-    return fmt.Errorf("field '{{ $name }}': %w", err)
-  }
-    {{- end }}
-    {{- if $prop.Pattern }}
-  if err := utils.ValidatePattern(e.{{ $field }}, `{{ $prop.Pattern }}`); err != nil {
-    return fmt.Errorf("field '{{ $name }}': %w", err)
-  }
-    {{- end }}
-  {{- else if or (eq $prop.Type "number") (eq $prop.Type "integer") }}
-    {{- if $prop.Minimum }}
-  if err := utils.ValidateMinimum(float64(e.{{ $field }}), {{ $prop.Minimum }}); err != nil {
-    return fmt.Errorf("field '{{ $name }}': %w", err)
-  }
-    {{- end }}
-    {{- if $prop.Maximum }}
-  if err := utils.ValidateMaximum(float64(e.{{ $field }}), {{ $prop.Maximum }}); err != nil {
-    return fmt.Errorf("field '{{ $name }}': %w", err)
-  }
-    {{- end }}
-    {{- if $prop.ExclusiveMinimum }}
-  if err := utils.ValidateExclusiveMinimum(float64(e.{{ $field }}), {{ $prop.ExclusiveMinimum }}); err != nil {
-    return fmt.Errorf("field '{{ $name }}': %w", err)
-  }
-    {{- end }}
-    {{- if $prop.ExclusiveMaximum }}
-  if err := utils.ValidateExclusiveMaximum(float64(e.{{ $field }}), {{ $prop.ExclusiveMaximum }}); err != nil {
-    return fmt.Errorf("field '{{ $name }}': %w", err)
-  }
-    {{- end }}
-    {{- if $prop.MultipleOf }}
-  if err := utils.ValidateMultipleOf(float64(e.{{ $field }}), {{ $prop.MultipleOf }}); err != nil {
-    return fmt.Errorf("field '{{ $name }}': %w", err)
-  }
-    {{- end }}
-  {{- end }}
-  {{- end }}
-
-  {{- if not (isRequired $name $.Required) }}
-  if e.{{ $field }} != nil {
-    {{- if eq $prop.Type "string" }}
-      {{- if $prop.MinLength }}
-    if err := utils.ValidateMinLength(*e.{{ $field }}, {{ $prop.MinLength }}); err != nil {
-      return fmt.Errorf("field '{{ $name }}': %w", err)
-    }
-      {{- end }}
-      {{- if $prop.MaxLength }}
-    if err := utils.ValidateMaxLength(*e.{{ $field }}, {{ $prop.MaxLength }}); err != nil {
-      return fmt.Errorf("field '{{ $name }}': %w", err)
-    }
-      {{- end }}
-      {{- if $prop.Pattern }}
-    if err := utils.ValidatePattern(*e.{{ $field }}, `{{ $prop.Pattern }}`); err != nil {
-      return fmt.Errorf("field '{{ $name }}': %w", err)
-    }
-      {{- end }}
-    {{- else if or (eq $prop.Type "number") (eq $prop.Type "integer") }}
-      {{- if $prop.Minimum }}
-    if err := utils.ValidateMinimum(float64(*e.{{ $field }}), {{ $prop.Minimum }}); err != nil {
-      return fmt.Errorf("field '{{ $name }}': %w", err)
-    }
-      {{- end }}
-      {{- if $prop.Maximum }}
-    if err := utils.ValidateMaximum(float64(*e.{{ $field }}), {{ $prop.Maximum }}); err != nil {
-      return fmt.Errorf("field '{{ $name }}': %w", err)
-    }
-      {{- end }}
-      {{- if $prop.ExclusiveMinimum }}
-    if err := utils.ValidateExclusiveMinimum(float64(*e.{{ $field }}), {{ $prop.ExclusiveMinimum }}); err != nil {
-      return fmt.Errorf("field '{{ $name }}': %w", err)
-    }
-      {{- end }}
-      {{- if $prop.ExclusiveMaximum }}
-    if err := utils.ValidateExclusiveMaximum(float64(*e.{{ $field }}), {{ $prop.ExclusiveMaximum }}); err != nil {
-      return fmt.Errorf("field '{{ $name }}': %w", err)
-    }
-      {{- end }}
-      {{- if $prop.MultipleOf }}
-    if err := utils.ValidateMultipleOf(float64(*e.{{ $field }}), {{ $prop.MultipleOf }}); err != nil {
-      return fmt.Errorf("field '{{ $name }}': %w", err)
-    }
-      {{- end }}
-    {{- end }}
-  }
-  {{- end }}
-{{- end }}
-
-  {{- with index .Properties "id" }}
-    {{- if isRequired "id" $.Required }}
-  if _, err := uuid.Parse(e.Id); err != nil {
-    return fmt.Errorf("field 'id' must be a valid UUID")
-  }
-    {{- end }}
-  {{- end }}
-
-  return nil
+func (e *Entity) Validate() error {
+	return nil
 }
 
 func (*Entity) TableName() string {

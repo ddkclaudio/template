@@ -33,7 +33,7 @@ func (c *Controller) Update(id, requestBody, authHeader string) (*dto.ResponseDT
 	}
 
 	if dto.Owner == nil {
-		dto.Owner = entity.Owner
+		dto.Owner = &entity.Owner
 	}
 
 	updatedEntity, err := c.service.Update(entity)

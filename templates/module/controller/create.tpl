@@ -17,8 +17,8 @@ func (c *Controller) Create(requestBody string, authHeader string) (*dto.Respons
 		return nil, utils.NewError(err.Error(), utils.StatusBadRequest)
 	}
 
-	if !utils.ContainsRole(authUser.Roles, "admin") || dto.Owner == nil {
-		dto.Owner = &authUser.Id
+	if !utils.ContainsRole(authUser.Roles, "admin") || dto.Owner == "" {
+		dto.Owner = authUser.Id
 	}
 
 	if err := dto.Validate(); err != nil {

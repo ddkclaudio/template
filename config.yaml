@@ -1,0 +1,21 @@
+# Lista de templates a serem aplicados
+# Cada item define:
+#   source: caminho para os templates .tpl
+#   destination: caminho onde os arquivos gerados serão salvos
+#   description: (opcional) descrição amigável do template
+
+- name: Handlers
+  description: Templates para geração de handlers da API
+  source: templates/handlers
+  destination: projects/api/handlers
+
+- name: Modules
+  description: Templates para geração de módulos da biblioteca
+  source: templates/module
+  destination: projects/library/modules
+
+# Você pode adicionar novos templates aqui
+# - name: NomeDoTemplate
+#   description: O que este template gera
+#   source: templates/nome-do-template
+#   destination: projects/caminho-destino

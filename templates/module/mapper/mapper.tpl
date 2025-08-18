@@ -62,8 +62,8 @@ func ToEntityFromCreateDTO(dto *dto.CreateRequestDTO) *domain.Entity {
 	now := time.Now().Unix()
 	entity := &domain.Entity{
 		Id:        uuid.New().String(),
-		CreatedAt: &now,
-		UpdatedAt: &now,
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 	_ = copyStructFields(entity, dto)
 	return entity
